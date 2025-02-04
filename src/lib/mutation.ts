@@ -1,8 +1,9 @@
 import apiClient from "./apiClient";
 
 export interface AddToCartPayload {
-    productId: string;
+    productId: number;
     quantity: number;
+    action: "increase" | "decrease" | "set";
 }
 
 export const addToCart = async (credentials: AddToCartPayload) => {

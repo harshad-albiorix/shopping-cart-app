@@ -1,6 +1,10 @@
 [
   {
-    "productId": "4",
+    "productId": 4,
+    "quantity": 2
+  },
+  {
+    "productId": 3,
     "quantity": 1
   }
 ]

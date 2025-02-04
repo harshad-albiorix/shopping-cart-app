@@ -3,10 +3,11 @@ import fs from 'fs';
 import path from 'path';
 
 import { NextResponse } from 'next/server';
+import { readProducts } from '../products/route';
 
 const cartFilePath = path.join(process.cwd(), 'cart.json');
 
-export const readCart = (): { productId: string; quantity: number }[] => {
+export const readCart = (): { productId: number; quantity: number }[] => {
     try {
         const data = fs.readFileSync(cartFilePath, 'utf-8');
         return JSON.parse(data);
@@ -15,14 +16,22 @@ export const readCart = (): { productId: string; quantity: number }[] => {
     }
 };
 
-export const writeCart = (cart: { productId: string; quantity: number }[]) => {
+export const writeCart = (cart: { productId: number; quantity: number }[]) => {
     fs.writeFileSync(cartFilePath, JSON.stringify(cart, null, 2), 'utf-8');
 };
 
 export async function GET() {
     try {
         const cart = readCart();
-        return NextResponse.json({ message: "Fetch all cart products", data: cart });
+        const products = readProducts();
+        const cartProducts = cart.map(item => {
+            const product = products.find(product => product.id === item.productId);
+            return {
+                ...product,
+                quantity: item.quantity
+            };
+        });
+        return NextResponse.json({ message: "Fetch all cart products", data: cartProducts });
     } catch {
         return NextResponse.json({ error: 'Failed to get cart' }, { status: 500 });
     }
@@ -30,23 +39,37 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        const { productId, quantity } = await request.json();
-        if (!productId || !quantity || quantity <= 0) {
-            return NextResponse.json({ error: 'Invalid product data' }, { status: 400 });
+        const { productId, quantity, action } = await request.json();
+
+        if (!productId || quantity < 0) {
+            return NextResponse.json({ error: "Invalid product data" }, { status: 400 });
         }
+
         const cart = readCart();
         const existingItemIndex = cart.findIndex(item => item.productId === productId);
 
         if (existingItemIndex !== -1) {
-            cart[existingItemIndex].quantity += quantity;
-        } else {
-            cart.push({ productId, quantity });
+            if (action === "increase") {
+                cart[existingItemIndex].quantity += 1;
+            } else if (action === "decrease") {
+                cart[existingItemIndex].quantity = Math.max(1, cart[existingItemIndex].quantity - 1);
+            } else if (action === "set") {
+                if (quantity > 0) {
+                    cart[existingItemIndex].quantity = quantity;
+                } else {
+                    cart.splice(existingItemIndex, 1); // Remove item if quantity is 0
+                }
+            }
+        } else if (action === "increase" || action === "set") {
+            if (quantity > 0) {
+                cart.push({ productId, quantity: action === "increase" ? 1 : quantity });
+            }
         }
 
         writeCart(cart);
 
-        return NextResponse.json({ message: "Add product into cart", data: cart });
+        return NextResponse.json({ message: "Cart updated", data: cart });
     } catch {
-        return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+        return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
     }
 }

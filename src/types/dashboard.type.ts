@@ -11,3 +11,4 @@ export interface ProductsType {
     rating: Rating;
     title: string
 }
+

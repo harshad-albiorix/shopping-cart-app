@@ -1,5 +1,5 @@
 "use client";
-import { getCartProducts, getProducts } from "@/lib/api";
+import { getProducts } from "@/lib/api";
 import { addToCart } from "@/lib/mutation";
 import { ProductsType } from "@/types/dashboard.type";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -16,21 +16,12 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
     mutationFn: addToCart,
   });
 
-  const query = useQuery({
-    queryKey: ["get-cart-products"],
-    queryFn: async () => {
-      const response = await getCartProducts();
-      return response.data;
-    },
-  });
-
-  console.log("data", query.data);
-
   const handleAddToCart = async () => {
     try {
       await mutation.mutateAsync({
-        productId: product.id.toString(),
+        productId: product.id,
         quantity: 1,
+        action: "set",
       });
     } catch (error) {
       console.error(error);
@@ -72,7 +63,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
 };
 
 export const HomeContainer = () => {
-  const { data, isLoading } = useQuery<ProductsType[]>({
+  const { data } = useQuery<ProductsType[]>({
     queryKey: ["get-products"],
     queryFn: async () => {
       const response = await getProducts();
