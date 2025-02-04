@@ -29,3 +29,7 @@ export const registerUser = async (credentials: RegisterCredentials): Promise<Us
     const { data } = await apiClient.post("/api/register", credentials);
     return data;
 };
+
+export const logoutUser = async () => {
+    return await apiClient.post("/api/logout");
+}

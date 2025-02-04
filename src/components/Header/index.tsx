@@ -1,9 +1,37 @@
 "use client";
+import { logoutUser } from "@/lib/auth";
+import { logout } from "@/redux/slices/authSlice";
+import { RootState } from "@/redux/store";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
 
 export const Header = () => {
+  const cartSelector = useSelector((state: RootState) => state.cart);
+  const dispatch = useDispatch();
   const router = useRouter();
+
+  const logoutMutation = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logoutUser,
+  });
+
+  const itemCount = cartSelector.items.reduce(
+    (acc, item) => acc + item.quantity,
+    0
+  );
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+      dispatch(logout());
+      router.push("/login");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <div
@@ -30,12 +58,23 @@ export const Header = () => {
       </div>
 
       <nav className="hidden md:flex space-x-6">
-        <Link href="/cart" className="hover:text-blue-400 font-semibold">
+        <Link
+          href="/cart"
+          className="relative hover:text-blue-400 font-semibold"
+        >
           View Cart
+          {itemCount > 0 && (
+            <span className="absolute -top-2 -right-4 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+              {itemCount}
+            </span>
+          )}
         </Link>
-        <Link href="/" className="hover:text-blue-400 font-semibold">
+        <button
+          className="hover:text-blue-400 font-semibold"
+          onClick={handleLogout}
+        >
           Logout
-        </Link>
+        </button>
       </nav>
     </header>
   );

@@ -49,6 +49,7 @@ export async function POST(request: Request) {
         const existingItemIndex = cart.findIndex(item => item.productId === productId);
 
         if (existingItemIndex !== -1) {
+            // Product already in cart, update quantity based on action
             if (action === "increase") {
                 cart[existingItemIndex].quantity += 1;
             } else if (action === "decrease") {
@@ -59,10 +60,16 @@ export async function POST(request: Request) {
                 } else {
                     cart.splice(existingItemIndex, 1); // Remove item if quantity is 0
                 }
+            } else if (action === "delete") {
+                cart.splice(existingItemIndex, 1); // Remove product from cart
             }
-        } else if (action === "increase" || action === "set") {
-            if (quantity > 0) {
-                cart.push({ productId, quantity: action === "increase" ? 1 : quantity });
+        } else {
+            // Product not in cart, just add it
+            if (action === "increase") {
+                cart.push({
+                    productId,
+                    quantity: 1,
+                });
             }
         }
 

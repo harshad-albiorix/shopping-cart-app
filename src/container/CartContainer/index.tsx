@@ -1,52 +1,14 @@
 "use client";
-import { getCartProducts } from "@/lib/api";
-import { addToCart } from "@/lib/mutation";
+import { useCart } from "@/hooks/useCart";
 import { ProductsType } from "@/types/dashboard.type";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
 interface FetchCartProductsType extends ProductsType {
   quantity: number;
 }
 
-const CartProducts = ({
-  product,
-  refetchProducts,
-}: {
-  product: FetchCartProductsType;
-  refetchProducts: () => void;
-}) => {
-  const mutation = useMutation({
-    mutationKey: ["add-to-cart"],
-    mutationFn: addToCart,
-  });
-
-  const handleIncrement = async () => {
-    try {
-      await mutation.mutateAsync({
-        productId: product.id,
-        quantity: 1,
-        action: "increase",
-      });
-
-      await refetchProducts();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleDecrement = async () => {
-    try {
-      await mutation.mutateAsync({
-        productId: product.id,
-        quantity: 1,
-        action: "decrease",
-      });
-      await refetchProducts();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+const CartProducts = ({ product }: { product: FetchCartProductsType }) => {
+  const { handleIncrement, handleDecrement } = useCart();
 
   return (
     <div
@@ -66,55 +28,42 @@ const CartProducts = ({
           <p className="text-gray-600">${product.price.toFixed(2)}</p>
         </div>
       </div>
-      <div className="flex items-center border border-gray-300 rounded-lg">
-        <button
-          className="px-3 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-l-lg transition duration-300"
-          onClick={handleDecrement}
-        >
-          -
-        </button>
-        <span className="px-4 py-1 text-lg font-semibold border-l border-r border-gray-300">
-          {product.quantity}
-        </span>
-        <button
-          className="px-3 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-r-lg transition duration-300"
-          onClick={handleIncrement}
-        >
-          +
-        </button>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center border border-gray-300 rounded-lg">
+          <button
+            className="px-3 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-l-lg transition duration-300"
+            onClick={() => handleDecrement(product)}
+          >
+            -
+          </button>
+          <span className="px-4 py-1 text-lg font-semibold border-l border-r border-gray-300">
+            {product.quantity}
+          </span>
+          <button
+            className="px-3 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-r-lg transition duration-300"
+            onClick={() => handleIncrement(product)}
+          >
+            +
+          </button>
+        </div>
+        <p className="text-lg font-semibold">
+          ${(product.price * product.quantity).toFixed(2)}
+        </p>
       </div>
-      <p className="text-lg font-semibold">
-        ${(product.price * product.quantity).toFixed(2)}
-      </p>
     </div>
   );
 };
 
 export const CartContainer = () => {
-  const products = useQuery<FetchCartProductsType[]>({
-    queryKey: ["get-cart-products"],
-    queryFn: async () => {
-      const response = await getCartProducts();
-      return response.data;
-    },
-  });
-
-  const totalPrice = products?.data?.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const { cartProducts, totalPrice } = useCart();
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2">
-          {products?.data?.map((item) => (
-            <CartProducts
-              key={item.id}
-              product={item}
-              refetchProducts={products.refetch}
-            />
+          {cartProducts?.map((item) => (
+            <CartProducts key={item.id} product={item} />
           ))}
         </div>
         <div className="bg-gray-50 p-6 rounded-lg">

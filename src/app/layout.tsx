@@ -10,12 +10,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ReduxProvider>
-      <html lang="en">
-        <body>
+    <html lang="en">
+      <body>
+        <ReduxProvider>
           <ReactQueryProvider>{children}</ReactQueryProvider>
-        </body>
-      </html>
-    </ReduxProvider>
+        </ReduxProvider>
+      </body>
+    </html>
   );
 }
