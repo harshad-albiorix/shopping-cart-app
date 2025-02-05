@@ -1,8 +1,9 @@
 "use client";
+
 import { useCart } from "@/hooks/useCart";
-import { getCartProducts, getProducts } from "@/lib/api";
+import { getProducts } from "@/lib/api";
 import { ProductsType } from "@/types/dashboard.type";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { FC } from "react";
 
@@ -10,22 +11,10 @@ interface ProductCardProps {
   product: ProductsType;
 }
 
-interface FetchCartProductsType extends ProductsType {
-  quantity: number;
-}
-
 const ProductCard: FC<ProductCardProps> = ({ product }) => {
-  const { handleAddToCart } = useCart();
+  const { cartProducts, handleAddToCart } = useCart();
 
-  const products = useQuery<FetchCartProductsType[]>({
-    queryKey: ["get-cart-products"],
-    queryFn: async () => {
-      const response = await getCartProducts();
-      return response.data;
-    },
-  });
-
-  const productInCart = products.data?.find((item) => item.id === product.id);
+  const productInCart = cartProducts?.find((item) => item.id === product.id);
 
   return (
     <div className="relative container mx-auto max-w-sm rounded overflow-hidden shadow-lg bg-white">
@@ -69,19 +58,14 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
 };
 
 export const HomeContainer = () => {
-  const { data } = useQuery<ProductsType[]>({
-    queryKey: ["get-products"],
-    queryFn: async () => {
-      const response = await getProducts();
-      return response.data;
-    },
-  });
+  const { data } = useSuspenseQuery(getProducts);
 
   return (
     <div className="grid grid-cols-4 gap-4">
-      {data?.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
+      {Array.isArray(data?.data) &&
+        data?.data?.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
     </div>
   );
 };

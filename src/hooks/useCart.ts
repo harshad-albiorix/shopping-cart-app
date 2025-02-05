@@ -3,7 +3,7 @@ import { getCartProducts } from "@/lib/api";
 import { addToCart } from "@/lib/mutation";
 import { setCartProducts } from "@/redux/slices/cartSlice";
 import { ProductsType } from "@/types/dashboard.type";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
@@ -14,20 +14,15 @@ interface FetchCartProductsType extends ProductsType {
 
 export const useCart = () => {
     const dispatch = useDispatch();
-    const products = useQuery<FetchCartProductsType[]>({
-        queryKey: ["get-cart-products"],
-        queryFn: async () => {
-            const response = await getCartProducts();
-            return response.data;
-        },
-    });
+
+    const products = useSuspenseQuery(getCartProducts);
 
     const mutation = useMutation({
         mutationKey: ["add-to-cart"],
         mutationFn: addToCart,
     });
 
-    const totalPrice = products?.data?.reduce(
+    const totalPrice = products?.data?.data?.reduce(
         (total, item) => total + item.price * item.quantity,
         0
     );
@@ -96,12 +91,12 @@ export const useCart = () => {
 
     useEffect(() => {
         if (products.data) {
-            dispatch(setCartProducts(products.data));
+            dispatch(setCartProducts(products?.data?.data));
         }
     }, [dispatch, products.data]);
 
     return {
-        cartProducts: products.data,
+        cartProducts: products.data.data,
         totalPrice,
         cartProductsRefetch: products.refetch,
         handleAddToCart,
