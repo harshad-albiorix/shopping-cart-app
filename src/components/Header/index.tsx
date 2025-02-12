@@ -17,7 +17,7 @@ export const Header = () => {
     mutationFn: logoutUser,
   });
 
-  const itemCount = cartSelector.items.reduce(
+  const itemCount = cartSelector?.items?.reduce(
     (acc, item) => acc + item.quantity,
     0
   );
@@ -36,7 +36,7 @@ export const Header = () => {
     <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <div
         className="flex items-center cursor-pointer"
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/dashboard")}
         role="button"
       >
         <svg

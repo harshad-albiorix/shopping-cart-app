@@ -14,7 +14,9 @@ interface ProductCardProps {
 const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const { cartProducts, handleAddToCart } = useCart();
 
-  const productInCart = cartProducts?.find((item) => item.id === product.id);
+  const productInCart = cartProducts?.find(
+    (item) => item?.productId?._id === product._id
+  );
 
   return (
     <div className="relative container mx-auto max-w-sm rounded overflow-hidden shadow-lg bg-white">
@@ -63,8 +65,8 @@ export const HomeContainer = () => {
   return (
     <div className="grid grid-cols-4 gap-4">
       {Array.isArray(data?.data) &&
-        data?.data?.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        data?.data?.map((product, index) => (
+          <ProductCard key={index} product={product} />
         ))}
     </div>
   );

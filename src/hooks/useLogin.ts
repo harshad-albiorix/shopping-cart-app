@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/redux/slices/authSlice";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { loginWithEmail } from "@/lib/firebaseConfig";
 
 
 export function useLogin() {
@@ -30,22 +31,30 @@ export function useLogin() {
 
     const handleSubmit = async (values: LoginCredentials) => {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const data: any = await loginMutation.mutateAsync(values);
 
-            dispatch(
-                loginSuccess({
-                    token: data.data.token,
-                    user: {
-                        firstName: data.data.user.firstName,
-                        lastName: data.data.user.lastName,
-                        email: data.data.user.email,
-                    },
-                })
-            );
+            const token = await loginWithEmail({
+                email: values.email, password: values.password
+            })
 
-            await axios.post("/api/set-cookies", { token: data.data.token })
-            router.push("/dashboard")
+            if (token) {
+                await axios.post("/api/set-cookies", { token: token })
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const data: any = await loginMutation.mutateAsync(values);
+
+                dispatch(
+                    loginSuccess({
+                        token: data.data.token,
+                        user: {
+                            firstName: data.data.firstName,
+                            lastName: data.data.lastName,
+                            email: data.data.email,
+                        },
+                    })
+                );
+
+                router.push("/dashboard")
+            }
 
         } catch (error) {
             console.error(error);

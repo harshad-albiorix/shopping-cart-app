@@ -1,26 +1,26 @@
 "use client";
 import { useCart } from "@/hooks/useCart";
-import { FetchCartProductsType } from "@/types/dashboard.type";
+import { CartProductsType } from "@/types/dashboard.type";
 import Image from "next/image";
 
-const CartProducts = ({ product }: { product: FetchCartProductsType }) => {
-  const { handleIncrement, handleDecrement } = useCart();
+const CartProducts = ({ product }: { product: CartProductsType }) => {
+  const { handleIncrement, handleDecrement, handleRemoveFromCart } = useCart();
 
   return (
     <div
-      key={product.id}
+      key={product.productId?._id}
       className="flex items-center justify-between border-b py-4"
     >
       <div className="flex items-center">
         <Image
           height={500}
           width={500}
-          src={product.image}
-          alt={product.title}
+          src={product.productId?.image}
+          alt={product.productId?.title}
           className="w-20 h-20 object-cover rounded-lg"
         />
         <div className="ml-4">
-          <h2 className="text-lg font-semibold">{product.title}</h2>
+          <h2 className="text-lg font-semibold">{product?.productId?.title}</h2>
           <p className="text-gray-600">${product.price.toFixed(2)}</p>
         </div>
       </div>
@@ -45,6 +45,28 @@ const CartProducts = ({ product }: { product: FetchCartProductsType }) => {
         <p className="text-lg font-semibold">
           ${(product.price * product.quantity).toFixed(2)}
         </p>
+        <button
+          className="text-red-500"
+          onClick={() => handleRemoveFromCart(product)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-2 14H7L5 6"></path>
+            <path d="M10 11v6"></path>
+            <path d="M14 11v6"></path>
+            <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"></path>
+          </svg>
+        </button>
       </div>
     </div>
   );

@@ -1,12 +1,9 @@
-import { ProductsType } from '@/types/dashboard.type';
+import { CartProductsType } from '@/types/dashboard.type';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface CartItem extends ProductsType {
-    quantity: number;
-}
 
 interface CartState {
-    items: CartItem[];
+    items: CartProductsType[];
 }
 
 const initialState: CartState = {
@@ -17,7 +14,7 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        setCartProducts(state, action: PayloadAction<CartItem[]>) {
+        setCartProducts(state, action: PayloadAction<CartProductsType[]>) {
             state.items = action.payload;
         },
     },

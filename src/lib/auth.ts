@@ -1,4 +1,5 @@
 
+import axios from "axios";
 import apiClient from "./apiClient";
 
 export type LoginCredentials = {
@@ -21,15 +22,15 @@ export type User = {
 };
 
 export const loginUser = async (credentials: LoginCredentials): Promise<User> => {
-    const { data } = await apiClient.post("/api/login", credentials);
+    const { data } = await apiClient.post("/auth/login", credentials);
     return data;
 };
 
 export const registerUser = async (credentials: RegisterCredentials): Promise<User> => {
-    const { data } = await apiClient.post("/api/register", credentials);
+    const { data } = await apiClient.post("/auth/sign-up", credentials);
     return data;
 };
 
 export const logoutUser = async () => {
-    return await apiClient.delete("/api/set-cookies")
+    return await axios.delete("/api/set-cookies")
 }

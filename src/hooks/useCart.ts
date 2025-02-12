@@ -1,8 +1,8 @@
 "use client";
 import { getCartProducts } from "@/lib/api";
-import { addToCart } from "@/lib/mutation";
+import { addToCart, removeCartItem } from "@/lib/mutation";
 import { setCartProducts } from "@/redux/slices/cartSlice";
-import { FetchCartProductsType, ProductsType } from "@/types/dashboard.type";
+import { CartProductsType, ProductsType } from "@/types/dashboard.type";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -19,17 +19,23 @@ export const useCart = () => {
         mutationFn: addToCart,
     });
 
-    const totalPrice = products?.data?.data?.reduce(
-        (total, item) => total + item.price * item.quantity,
+    const removeCartItemMutation = useMutation({
+        mutationKey: ["remove-cart-item"],
+        mutationFn: removeCartItem
+    })
+
+    const totalPrice = products?.data?.data?.items?.reduce(
+        (total, item) => total + item?.price * item.quantity,
         0
     );
 
     const handleAddToCart = async (product: ProductsType) => {
+
         try {
             await mutation.mutateAsync({
-                productId: product.id,
+                productId: product._id,
                 quantity: 1,
-                action: "increase",
+                isIncreasing: true
             });
 
             products.refetch();
@@ -38,12 +44,12 @@ export const useCart = () => {
         }
     };
 
-    const handleIncrement = async (product: FetchCartProductsType) => {
+    const handleIncrement = async (product: CartProductsType) => {
         try {
             await mutation.mutateAsync({
-                productId: product.id,
+                productId: product.productId?._id,
                 quantity: 1,
-                action: "increase",
+                isIncreasing: true
             });
 
             products.refetch();
@@ -52,19 +58,16 @@ export const useCart = () => {
         }
     };
 
-    const handleDecrement = async (product: FetchCartProductsType) => {
+    const handleDecrement = async (product: CartProductsType) => {
         try {
             if (product.quantity > 1) {
                 await mutation.mutateAsync({
-                    productId: product.id,
+                    productId: product?.productId?._id,
                     quantity: 1,
-                    action: "decrease",
+                    isIncreasing: false
                 });
             } else {
-                await mutation.mutateAsync({
-                    productId: product.id,
-                    action: "delete",
-                });
+                await removeCartItemMutation.mutateAsync(product?.productId?._id)
             }
 
             products.refetch();
@@ -73,12 +76,9 @@ export const useCart = () => {
         }
     };
 
-    const handleRemoveFromCart = async (product: ProductsType) => {
+    const handleRemoveFromCart = async (product: CartProductsType) => {
         try {
-            await mutation.mutateAsync({
-                productId: product.id,
-                action: "delete",
-            });
+            await removeCartItemMutation.mutateAsync(product?.productId?._id)
 
             products.refetch();
         } catch (error) {
@@ -88,12 +88,12 @@ export const useCart = () => {
 
     useEffect(() => {
         if (products.data) {
-            dispatch(setCartProducts(products?.data?.data));
+            dispatch(setCartProducts(products?.data?.data?.items));
         }
     }, [dispatch, products.data]);
 
     return {
-        cartProducts: products.data.data,
+        cartProducts: products.data.data?.items,
         totalPrice,
         cartProductsRefetch: products.refetch,
         handleAddToCart,

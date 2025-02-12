@@ -5,13 +5,27 @@ interface Rating {
 export interface ProductsType {
     category: string;
     description: string;
-    id: number;
+    _id: string;
     image: string
     price: number;
     rating: Rating;
     title: string
 }
 
-export interface FetchCartProductsType extends ProductsType {
+export interface CartProductsType {
+    productId: ProductsType;
     quantity: number;
+    price: number;
+
+}
+
+
+export interface FetchCartProductsType {
+    _id: string;
+    userId: string;
+    items: CartProductsType[];
+    totalAmount: number;
+    createdAt: string;
+    updatedAt: string;
+    __v: 0
 }
