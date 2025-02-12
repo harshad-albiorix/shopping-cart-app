@@ -14,8 +14,6 @@ export function withAuth(Component: ComponentType) {
     // State to track if the component is mounted to handle client-side only logic
     const [isMounted, setIsMounted] = useState(false);
 
-    console.log("token", token);
-
     useEffect(() => {
       // Ensure we only run this on the client side
       setIsMounted(true);

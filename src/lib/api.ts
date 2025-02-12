@@ -3,12 +3,8 @@
 
 import { ResponseType } from "@/types/common.type";
 import apiClient from "./apiClient";
-import { ProductsType } from "@/types/dashboard.type";
+import { FetchCartProductsType, ProductsType } from "@/types/dashboard.type";
 import { queryOptions } from "@tanstack/react-query";
-
-interface FetchCartProductsType extends ProductsType {
-    quantity: number;
-}
 
 
 export const getProducts1 = async (): Promise<ResponseType<ProductsType[]>> => {

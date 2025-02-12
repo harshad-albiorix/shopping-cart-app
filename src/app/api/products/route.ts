@@ -1,21 +1,12 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
+
 import path from 'path';
 import { ProductsType } from '@/types/dashboard.type';
+import { readJsonFile } from '@/utils/readJsonFile';
 
 const productsFilePath = path.join(process.cwd(), 'products.json');
 
-
-
-export const readProducts = (): ProductsType[] => {
-    try {
-        const data = fs.readFileSync(productsFilePath, 'utf-8');
-        return JSON.parse(data);
-    } catch {
-        return [];
-    }
-};
-
+const readProducts = (): ProductsType[] => readJsonFile<ProductsType>(productsFilePath);
 
 export async function GET() {
     try {
@@ -25,24 +16,3 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to get products' }, { status: 500 });
     }
 }
-
-
-// export async function GET() {
-//     try {
-//         const res = await fetch(`${baseURL}/products`);
-//         if (!res.ok) {
-//             throw new Error("Failed to fetch products");
-//         }
-//         const products = await res.json();
-
-//         return NextResponse.json({
-//             message: "Fetch products successfully",
-//             data: products
-//         }, { status: 200 });
-//     } catch (error) {
-//         return NextResponse.json({
-//             message: "Failed to fetch products",
-//             error: (error as Error).message
-//         }, { status: 500 });
-//     }
-// }

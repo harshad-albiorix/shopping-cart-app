@@ -1,11 +1,7 @@
 "use client";
 import { useCart } from "@/hooks/useCart";
-import { ProductsType } from "@/types/dashboard.type";
+import { FetchCartProductsType } from "@/types/dashboard.type";
 import Image from "next/image";
-
-interface FetchCartProductsType extends ProductsType {
-  quantity: number;
-}
 
 const CartProducts = ({ product }: { product: FetchCartProductsType }) => {
   const { handleIncrement, handleDecrement } = useCart();
@@ -62,8 +58,8 @@ export const CartContainer = () => {
       <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2">
-          {cartProducts?.map((item) => (
-            <CartProducts key={item.id} product={item} />
+          {cartProducts?.map((item, i) => (
+            <CartProducts key={i} product={item} />
           ))}
         </div>
         <div className="bg-gray-50 p-6 rounded-lg">

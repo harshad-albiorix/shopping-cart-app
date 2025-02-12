@@ -1,9 +1,10 @@
+"use client";
 import { getQueryClient } from "@/app/get-query-client";
 import { CartContainer } from "@/container";
 import { getCartProducts } from "@/lib/api";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-function CartPage() {
+export default function CartPage() {
   const queryClient = getQueryClient();
 
   void queryClient.prefetchQuery(getCartProducts);
@@ -14,5 +15,3 @@ function CartPage() {
     </HydrationBoundary>
   );
 }
-
-export default CartPage;

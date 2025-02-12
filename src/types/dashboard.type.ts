@@ -12,3 +12,6 @@ export interface ProductsType {
     title: string
 }
 
+export interface FetchCartProductsType extends ProductsType {
+    quantity: number;
+}

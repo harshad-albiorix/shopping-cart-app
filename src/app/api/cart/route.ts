@@ -3,20 +3,17 @@ import fs from 'fs';
 import path from 'path';
 
 import { NextResponse } from 'next/server';
-import { readProducts } from '../products/route';
+import { ProductsType } from '@/types/dashboard.type';
+import { readJsonFile } from '@/utils/readJsonFile';
+
 
 const cartFilePath = path.join(process.cwd(), 'cart.json');
+const productsFilePath = path.join(process.cwd(), 'products.json');
 
-export const readCart = (): { productId: number; quantity: number }[] => {
-    try {
-        const data = fs.readFileSync(cartFilePath, 'utf-8');
-        return JSON.parse(data);
-    } catch {
-        return [];
-    }
-};
+const readProducts = (): ProductsType[] => readJsonFile<ProductsType>(productsFilePath);
+const readCart = (): { productId: number; quantity: number }[] => readJsonFile<{ productId: number; quantity: number }>(cartFilePath)
 
-export const writeCart = (cart: { productId: number; quantity: number }[]) => {
+const writeCart = (cart: { productId: number; quantity: number }[]) => {
     fs.writeFileSync(cartFilePath, JSON.stringify(cart, null, 2), 'utf-8');
 };
 

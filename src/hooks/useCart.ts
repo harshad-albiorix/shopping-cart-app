@@ -2,14 +2,11 @@
 import { getCartProducts } from "@/lib/api";
 import { addToCart } from "@/lib/mutation";
 import { setCartProducts } from "@/redux/slices/cartSlice";
-import { ProductsType } from "@/types/dashboard.type";
+import { FetchCartProductsType, ProductsType } from "@/types/dashboard.type";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-interface FetchCartProductsType extends ProductsType {
-    quantity: number;
-}
 
 
 export const useCart = () => {
