@@ -4,10 +4,11 @@ export async function middleware(request: NextRequest) {
     const currentUser = request.cookies.get("token")?.value;
     const { pathname } = request.nextUrl;
 
-    if (currentUser && pathname === "/login") {
+    if (currentUser && (pathname === "/login" || pathname === "/register")) {
         return Response.redirect(new URL("/dashboard", request.url));
     }
-    if (!currentUser && !pathname.startsWith("/login")) {
+
+    if (!currentUser && !pathname.startsWith("/login") && !pathname.startsWith("/register")) {
         return Response.redirect(new URL("/login", request.url));
     }
 

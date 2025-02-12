@@ -9,28 +9,30 @@ export const LoginForm = () => {
 
   return (
     <form className="space-y-6" onSubmit={formik.handleSubmit}>
-      <InputField
-        label="Email"
-        name="email"
-        type="email"
-        placeholder="Email address"
-        formik={formik}
-      />
-      <InputField
-        label="Password"
-        name="password"
-        type="password"
-        placeholder="Password"
-        formik={formik}
-      />
+      <div className="flex flex-col gap-4">
+        <InputField
+          label="Email"
+          name="email"
+          type="email"
+          placeholder="Email address"
+          formik={formik}
+        />
+        <InputField
+          label="Password"
+          name="password"
+          type="password"
+          placeholder="Password"
+          formik={formik}
+        />
 
-      <Link
-        href="/register"
-        className="text-sm text-blue-600 hover:text-blue-700 font-medium transition duration-200"
-      >
-        {"Don't have an account?"}
-        <span className="underline">Sign up here</span>
-      </Link>
+        <Link
+          href="/register"
+          className="text-sm text-blue-600 hover:text-blue-700 font-medium transition duration-200"
+        >
+          {"Don't have an account?"}{" "}
+          <span className="underline">Sign up here</span>
+        </Link>
+      </div>
 
       <div>
         <button
