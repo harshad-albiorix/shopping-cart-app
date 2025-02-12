@@ -49,14 +49,5 @@ export async function POST(request: Request) {
         { status: 200 }
     );
 
-    // Set cookie with the token
-    response.cookies.set('auth_token', token, {
-        httpOnly: true,  // This makes the cookie inaccessible via JavaScript
-        secure: process.env.NODE_ENV === 'production',  // Set to true for production (requires HTTPS)
-        sameSite: 'strict',  // Cookie will only be sent in first-party contexts
-        path: '/',  // Make the cookie available site-wide
-        maxAge: 3600,  // 1 hour (matches token expiration)
-    });
-
     return response;
 }

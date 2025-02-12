@@ -4,12 +4,14 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/redux/slices/authSlice";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 
 
 export function useLogin() {
     const dispatch = useDispatch();
-    const router = useRouter();
+    const router = useRouter()
+
     const loginMutation = useMutation<User, Error, LoginCredentials>({
         mutationFn: loginUser,
     });
@@ -41,7 +43,10 @@ export function useLogin() {
                     },
                 })
             );
-            router.push("/");
+
+            await axios.post("/api/set-cookies", { token: data.data.token })
+            router.push("/dashboard")
+
         } catch (error) {
             console.error(error);
         }

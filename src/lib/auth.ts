@@ -31,5 +31,5 @@ export const registerUser = async (credentials: RegisterCredentials): Promise<Us
 };
 
 export const logoutUser = async () => {
-    return await apiClient.post("/api/logout");
+    return await apiClient.delete("/api/set-cookies")
 }
